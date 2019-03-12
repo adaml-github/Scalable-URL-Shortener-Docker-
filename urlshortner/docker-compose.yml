@@ -1,0 +1,72 @@
+version: "3"
+services:
+  web:
+    image: leeadam/urlshortner
+    deploy:
+      replicas: 5
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - webnet
+      - redis
+      - postgres
+    ports:
+      - "5000:8080"
+    networks:
+      - webnet
+  visualizer:
+    image: dockersamples/visualizer:stable
+    ports:
+      - "5050:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    depends_on:
+      - webnet
+    networks:
+      - webnet
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - "/home/redis:/data"
+    depends_on:
+      - webnet
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    command: redis-server --appendonly yes
+    depends_on:
+      - "webnet"
+    networks:
+      - webnet
+  postgres:
+    image: postgres
+    volumes:
+      - "/home/postgres:/var/lib/postgresql/data"
+    environment:
+       POSTGRES_USER: root
+       POSTGRES_PASSWORD: root
+       POSTGRES_DB: app
+    ports:
+      - "5432:5432"
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    depends_on:
+      - webnet
+    networks:
+      - webnet
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - webnet
+networks:
+  webnet:

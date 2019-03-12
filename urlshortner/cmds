@@ -1,0 +1,16 @@
+docker build -t leeadam/urlshortner .
+docker push leeadam/urlshortner
+docker stack deploy -c docker-compose.yml urlshortner
+
+alias dl='docker service logs urlshortner_web'
+alias dr='docker stack rm urlshortner'
+alias g='/home/student/.lab1/CSC409-A2/urlshortner/get.sh'
+alias p='/home/student/.lab1/CSC409-A2/urlshortner/put.sh'
+alias u='docker push leeadam/urlshortner'
+alias b='docker build -t leeadam/urlshortner .'
+alias d='docker stack deploy -c docker-compose.yml urlshortner'
+alias t='curl -v http://10.11.12.17:5000/sid'
+alias tp="curl -X PUT -v 'http://10.11.12.17:5000/?short=yy&long=http://www.yahoo.ca'"
+
+curl -v http://10.11.12.17:5000/sid
+curl -X PUT -v 'http://10.11.12.17:5000/?short=yy&long=http://www.yahoo.ca'
